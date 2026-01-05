@@ -1,0 +1,41 @@
+modules = ["nodejs-20", "web", "python-3.11", "postgresql-16"]
+[agent]
+expertMode = true
+integrations = ["javascript_database:1.0.0"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["alsa-lib", "at-spi2-core", "cairo", "cups", "expat", "gitFull", "libdrm", "libxkbcommon", "mesa", "nspr", "nss", "pango", "playwright-driver", "unzip", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "NODE_ENV=production node ./dist/index.js"]
+build = ["npm", "run", "build"]
